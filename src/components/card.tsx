@@ -2,13 +2,16 @@ import { cn } from "../lib/utils";
 import { FC } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import { suitSymbols } from "../lib/contants";
-import { Cards } from "../lib/types";
+import { Cards, Suit } from "../lib/types";
 import { useAtom } from "jotai";
 import { flippedAtom } from "../lib/atoms";
 
-type CardProps = Cards;
+type CardProps = Cards & {
+  isBlocked?: boolean;
+  onClick?: () => void;
+};
 
-export const Card: FC<CardProps> = ({ suit, rank }) => {
+export const Card: FC<CardProps> = ({ suit, rank, isBlocked, onClick }) => {
   const [flipped, setFlipped] = useAtom(flippedAtom);
 
   const { transform, opacity } = useSpring({
@@ -20,14 +23,21 @@ export const Card: FC<CardProps> = ({ suit, rank }) => {
   const cardColorClass = cn({
     "text-red-500": suit === "Carreau" || suit === "Coeur",
     "text-black": suit === "Trèfle" || suit === "Pique",
+    "border-4 border-yellow-400": isBlocked,
   });
 
   return (
     <div
-      onClick={() => setFlipped((state) => !state)}
-      className="relative w-20 h-32 cursor-pointer"
+      onClick={() => {
+        if (!flipped) {
+          setFlipped(true);
+        }
+        onClick && onClick();
+      }}
+      className={`relative w-20 h-32 cursor-pointer ${
+        isBlocked ? "opacity-50" : ""
+      }`}
     >
-      {/* Front of the card */}
       <animated.div
         style={{
           opacity: opacity.to((o) => 1 - o),
@@ -40,7 +50,7 @@ export const Card: FC<CardProps> = ({ suit, rank }) => {
         )}
       >
         <span className="text-lg font-bold">{rank}</span>
-        <span className="text-2xl">{suitSymbols[suit]}</span>
+        <span className="text-2xl">{suitSymbols[suit as Suit]}</span>
       </animated.div>
 
       <animated.div

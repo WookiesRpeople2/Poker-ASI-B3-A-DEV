@@ -1,11 +1,14 @@
 import { useAtom } from "jotai";
-import { gameStateAtom } from "./lib/atoms";
+import { blockedCardsAtom, gameStateAtom, turnsLeftAtom } from "./lib/atoms";
 import { Hand } from "./components/Hand";
 import { useGetRandomHands } from "./hooks/useGetRandomCard";
 import { evaluatePokerHand } from "./lib/utils";
+import { useCallback } from "react";
 
 function App() {
   const [gameState, setGameState] = useAtom(gameStateAtom);
+  const [turnsLeft, setTurnsLeft] = useAtom<number>(turnsLeftAtom);
+  const [blockedCards, setBlockedCards] = useAtom<boolean[]>(blockedCardsAtom);
 
   const handleStartGame = () => {
     const playersHand = useGetRandomHands();
@@ -17,18 +20,43 @@ function App() {
       playersName: "Player1",
       status: "En cours",
       winner: undefined,
+      winngingString: "",
+      winningValue: 0,
     });
+
+    setTurnsLeft(3);
+    setBlockedCards(Array(playersHand.length).fill(false));
   };
 
-  const evaluateHands = () => {
+  const handleBlockCard = (index: number) => {
+    setBlockedCards((prev) =>
+      prev.map((blocked, i) => (i === index ? !blocked : blocked))
+    );
+  };
+
+  const handleReplaceCards = () => {
+    if (turnsLeft > 0) {
+      const newHand = gameState.playersHand.map((card, i) =>
+        blockedCards[i] ? card : useGetRandomHands()[i]
+      );
+
+      setGameState((prevState) => ({
+        ...prevState,
+        playersHand: newHand,
+      }));
+      setTurnsLeft(turnsLeft - 1);
+    }
+  };
+
+  const evaluateHands = useCallback(() => {
     const hands = {
       [gameState.playersName]: gameState.playersHand,
       computer: gameState.computersHand,
     };
 
-    const countValues = (hand) => {
+    const countValues = (hand: typeof gameState.playersHand) => {
       const counts = Array(9).fill(0);
-      const values = [];
+      const values: number[] = [];
 
       hand.forEach((card) => {
         counts[card.value] += 1;
@@ -51,31 +79,38 @@ function App() {
     );
 
     let winner = "";
-    let winngingString = "";
+    let winningString = "";
     let winningValue = 0;
 
     if (playerResult.value > computerResult.value) {
       winner = gameState.playersName;
-      winngingString = playerResult.winningString;
-      winningValue = playerResult.winningValue || 0;
+      winningString = playerResult.winningString;
+      winningValue = playerResult.winningValue;
     } else if (playerResult.value < computerResult.value) {
       winner = "computer";
-      winngingString = computerResult.winningString;
-      winningValue = computerResult.winningValue || 0;
+      winningString = computerResult.winningString;
+      winningValue = computerResult.winningValue;
     } else {
-      if (playerResult.winningValue > computerResult.winningValue || 0) {
+      const playerTotalValue = playerHandCounts.values.reduce(
+        (a, b) => a + b,
+        0
+      );
+      const computerTotalValue = computerHandCounts.values.reduce(
+        (a, b) => a + b,
+        0
+      );
+
+      if (playerTotalValue > computerTotalValue) {
         winner = gameState.playersName;
-        winngingString = playerResult.winningString;
-        winningValue = playerResult.winningValue || 0;
-      } else if (playerResult.winningValue < computerResult.winningValue || 0) {
+        winningString = playerResult.winningString;
+        winningValue = playerResult.winningValue;
+      } else if (playerTotalValue < computerTotalValue) {
         winner = "computer";
-        winngingString = computerResult.winningString;
-        winningValue = computerResult.winningValue || 0;
+        winningString = computerResult.winningString;
+        winningValue = computerResult.winningValue;
       } else {
         winner = "Tie";
-        winngingString = `Computer: ${
-          computerResult.winningValue || 0
-        } Player: ${playerResult.winningValue}`;
+        winningString = `Computer: (${computerResult.winningString} of ${computerResult.winningValue}) | Player: (${playerResult.winningString} of ${playerResult.winningValue})`; // Fixed typo
       }
     }
 
@@ -83,11 +118,11 @@ function App() {
     setGameState((prevState) => ({
       ...prevState,
       winner,
-      winngingString,
+      winningString, // Fixed typo
       winningValue,
       status: "Terminé",
     }));
-  };
+  }, []);
 
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
@@ -110,10 +145,19 @@ function App() {
             <Hand
               playerName={gameState.playersName}
               rHand={gameState.playersHand}
+              onBlockCard={handleBlockCard}
+              blockedCards={blockedCards}
             />
-
             <Hand playerName="Computer" rHand={gameState.computersHand} />
           </div>
+
+          <button
+            onClick={handleReplaceCards}
+            className="bg-yellow-500 text-white py-2 px-4 rounded shadow hover:bg-yellow-700"
+            disabled={turnsLeft <= 0}
+          >
+            Remplacer les Cartes ({turnsLeft} tours restants)
+          </button>
 
           <button
             onClick={evaluateHands}
