@@ -16,3 +16,7 @@ export const handAtom = atom<Cards[]>([]);
 export const gameStateAtom = atom<GameState>(initialGameState);
 
 export const flippedAtom = atom(false);
+
+export const turnsLeftAtom = atom<number>(3);
+
+export const blockedCardsAtom = atom<boolean[]>([]);

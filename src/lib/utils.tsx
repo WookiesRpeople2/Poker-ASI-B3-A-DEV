@@ -1,12 +1,11 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Cards, GameState } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const evaluatePokerHand = (counts, values) => {
+export const evaluatePokerHand = (counts: number[], values: number[]) => {
   const nRet = {
     value: 1,
     status: "Terminé",
@@ -39,12 +38,12 @@ export const evaluatePokerHand = (counts, values) => {
     nRet.value = 4;
     nRet.winningString = "Pair";
     nRet.winningValue = values[counts.indexOf(2)];
-  }
-  // If no pairs or better hands, find the high card
-  else {
+  } else {
     nRet.winningValue = Math.max(...values.filter((_, idx) => counts[idx] > 0));
+    nRet.winningString = "High Card";
   }
 
-  console.log("Hand Evaluation:", nRet);
+  if (nRet.winningValue === null) nRet.winningValue = 0;
+
   return nRet;
 };
