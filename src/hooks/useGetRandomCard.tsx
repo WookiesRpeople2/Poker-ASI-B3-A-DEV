@@ -24,8 +24,6 @@ const GetRandomHand = () => {
 };
 
 export const useGetRandomHands = () => {
-  console.log(cards);
-  const player1Hand = GetRandomHand();
-  const player2Hand = GetRandomHand();
-  return [player1Hand, player2Hand];
+  const playerHand = GetRandomHand();
+  return playerHand;
 };

@@ -2,19 +2,91 @@ import { useAtom } from "jotai";
 import { gameStateAtom } from "./lib/atoms";
 import { Hand } from "./components/Hand";
 import { useGetRandomHands } from "./hooks/useGetRandomCard";
+import { evaluatePokerHand } from "./lib/utils";
 
 function App() {
   const [gameState, setGameState] = useAtom(gameStateAtom);
 
   const handleStartGame = () => {
-    const [player1Hand, player2Hand] = useGetRandomHands();
+    const playersHand = useGetRandomHands();
+    const computersHand = useGetRandomHands();
 
     setGameState({
-      player1Hand,
-      player2Hand,
+      playersHand,
+      computersHand,
+      playersName: "Player1",
       status: "En cours",
       winner: undefined,
     });
+  };
+
+  const evaluateHands = () => {
+    const hands = {
+      [gameState.playersName]: gameState.playersHand,
+      computer: gameState.computersHand,
+    };
+
+    const countValues = (hand) => {
+      const counts = Array(9).fill(0);
+      const values = [];
+
+      hand.forEach((card) => {
+        counts[card.value] += 1;
+        if (!values.includes(card.value)) values.push(card.value);
+      });
+
+      return { counts, values: values.sort((a, b) => a - b) };
+    };
+
+    const playerHandCounts = countValues(hands[gameState.playersName]);
+    const computerHandCounts = countValues(hands.computer);
+
+    const playerResult = evaluatePokerHand(
+      playerHandCounts.counts,
+      playerHandCounts.values
+    );
+    const computerResult = evaluatePokerHand(
+      computerHandCounts.counts,
+      computerHandCounts.values
+    );
+
+    let winner = "";
+    let winngingString = "";
+    let winningValue = 0;
+
+    if (playerResult.value > computerResult.value) {
+      winner = gameState.playersName;
+      winngingString = playerResult.winningString;
+      winningValue = playerResult.winningValue || 0;
+    } else if (playerResult.value < computerResult.value) {
+      winner = "computer";
+      winngingString = computerResult.winningString;
+      winningValue = computerResult.winningValue || 0;
+    } else {
+      if (playerResult.winningValue > computerResult.winningValue || 0) {
+        winner = gameState.playersName;
+        winngingString = playerResult.winningString;
+        winningValue = playerResult.winningValue || 0;
+      } else if (playerResult.winningValue < computerResult.winningValue || 0) {
+        winner = "computer";
+        winngingString = computerResult.winningString;
+        winningValue = computerResult.winningValue || 0;
+      } else {
+        winner = "Tie";
+        winngingString = `Computer: ${
+          computerResult.winningValue || 0
+        } Player: ${playerResult.winningValue}`;
+      }
+    }
+
+    console.log("Winner:", winner);
+    setGameState((prevState) => ({
+      ...prevState,
+      winner,
+      winngingString,
+      winningValue,
+      status: "Terminé",
+    }));
   };
 
   return (
@@ -35,12 +107,16 @@ function App() {
       {gameState.status === "En cours" && (
         <>
           <div className="flex justify-between space-x-8">
-            <Hand playerName="Joueur 1" rHand={gameState.player1Hand} />
-            <Hand playerName="Joueur 2" rHand={gameState.player2Hand} />
+            <Hand
+              playerName={gameState.playersName}
+              rHand={gameState.playersHand}
+            />
+
+            <Hand playerName="Computer" rHand={gameState.computersHand} />
           </div>
 
           <button
-            onClick={() => {}}
+            onClick={evaluateHands}
             className="bg-green-500 text-white py-2 px-4 rounded shadow hover:bg-green-700"
           >
             Évaluer les Mains
@@ -50,7 +126,11 @@ function App() {
 
       {gameState.status === "Terminé" && (
         <h2 className="text-2xl font-bold">
-          {gameState.winner ? `Le gagnant est ${gameState.winner}` : "Égalité"}
+          {gameState.winner && `Le gagnant est ${gameState.winner}`}
+          <br />
+          {gameState.winngingString && `Won with: ${gameState.winngingString}`}
+          <br />
+          {gameState.winningValue && `Final score: ${gameState.winningValue}`}
         </h2>
       )}
     </div>

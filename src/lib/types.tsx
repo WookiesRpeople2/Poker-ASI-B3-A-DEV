@@ -1,17 +1,15 @@
 export type Cards = {
   suit: string;
   rank: string;
+  value: Number;
 };
 
 export type GameState = {
-  player1Hand: Cards[];
-  player2Hand: Cards[];
+  playersHand: Cards[];
+  computersHand: Cards[];
+  playersName: string;
   status: "En cours" | "Terminé" | "Attente";
+  winngingString: string;
+  winningValue: Number;
   winner?: string;
-};
-
-export const initialGameState: GameState = {
-  player1Hand: [],
-  player2Hand: [],
-  status: "Attente",
 };
