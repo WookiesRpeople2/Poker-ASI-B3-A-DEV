@@ -1,0 +1,39 @@
+{
+  "cards": [
+    { "suit": "Trèfle", "rank": "7" },
+    { "suit": "Trèfle", "rank": "8" },
+    { "suit": "Trèfle", "rank": "9" },
+    { "suit": "Trèfle", "rank": "10" },
+    { "suit": "Trèfle", "rank": "Valet" },
+    { "suit": "Trèfle", "rank": "Dame" },
+    { "suit": "Trèfle", "rank": "Roi" },
+    { "suit": "Trèfle", "rank": "As" },
+
+    { "suit": "Carreau", "rank": "7" },
+    { "suit": "Carreau", "rank": "8" },
+    { "suit": "Carreau", "rank": "9" },
+    { "suit": "Carreau", "rank": "10" },
+    { "suit": "Carreau", "rank": "Valet" },
+    { "suit": "Carreau", "rank": "Dame" },
+    { "suit": "Carreau", "rank": "Roi" },
+    { "suit": "Carreau", "rank": "As" },
+
+    { "suit": "Coeur", "rank": "7" },
+    { "suit": "Coeur", "rank": "8" },
+    { "suit": "Coeur", "rank": "9" },
+    { "suit": "Coeur", "rank": "10" },
+    { "suit": "Coeur", "rank": "Valet" },
+    { "suit": "Coeur", "rank": "Dame" },
+    { "suit": "Coeur", "rank": "Roi" },
+    { "suit": "Coeur", "rank": "As" },
+
+    { "suit": "Pique", "rank": "7" },
+    { "suit": "Pique", "rank": "8" },
+    { "suit": "Pique", "rank": "9" },
+    { "suit": "Pique", "rank": "10" },
+    { "suit": "Pique", "rank": "Valet" },
+    { "suit": "Pique", "rank": "Dame" },
+    { "suit": "Pique", "rank": "Roi" },
+    { "suit": "Pique", "rank": "As" }
+  ]
+}
