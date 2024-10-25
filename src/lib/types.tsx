@@ -1,7 +1,7 @@
 export type Suit = "Trèfle" | "Carreau" | "Coeur" | "Pique";
 
 export type Cards = {
-  suit: Suit;
+  suit: string;
   rank: string;
   value: number;
 };

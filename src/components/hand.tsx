@@ -7,7 +7,7 @@ import { handAtom } from "../lib/atoms";
 type HandProps = {
   playerName: string;
   rHand: Cards[];
-  onBlockCard?: (index: number) => void;
+  onBlockCard?: (index: number) => void; // Callback for blocking the card
   blockedCards?: boolean[];
 };
 
@@ -33,8 +33,8 @@ export const Hand: FC<HandProps> = ({
             suit={card.suit}
             rank={card.rank}
             value={card.value}
-            isBlocked={blockedCards[index]}
-            onClick={() => onBlockCard(index)}
+            isBlocked={blockedCards[index]} // Pass the blocked state to Card
+            onClick={() => onBlockCard(index)} // Pass the block function to Card
           />
         ))}
       </div>

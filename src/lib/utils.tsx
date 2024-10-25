@@ -43,7 +43,7 @@ export const evaluatePokerHand = (counts: number[], values: number[]) => {
     nRet.winningString = "High Card";
   }
 
-  if (nRet.winningValue === null) nRet.winningValue = 0;
+  if (!nRet.winningValue) nRet.winningValue = 0;
 
   return nRet;
 };

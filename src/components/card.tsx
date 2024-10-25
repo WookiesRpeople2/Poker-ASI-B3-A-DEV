@@ -8,7 +8,7 @@ import { flippedAtom } from "../lib/atoms";
 
 type CardProps = Cards & {
   isBlocked?: boolean;
-  onClick?: () => void;
+  onClick?: () => void; // Callback for blocking the card
 };
 
 export const Card: FC<CardProps> = ({ suit, rank, isBlocked, onClick }) => {
@@ -26,14 +26,16 @@ export const Card: FC<CardProps> = ({ suit, rank, isBlocked, onClick }) => {
     "border-4 border-yellow-400": isBlocked,
   });
 
+  const handleClick = () => {
+    if (!isBlocked) {
+      setFlipped(true);
+      onClick && onClick(); // Execute the callback to block the card
+    }
+  };
+
   return (
     <div
-      onClick={() => {
-        if (!flipped) {
-          setFlipped(true);
-        }
-        onClick && onClick();
-      }}
+      onClick={handleClick}
       className={`relative w-20 h-32 cursor-pointer ${
         isBlocked ? "opacity-50" : ""
       }`}
